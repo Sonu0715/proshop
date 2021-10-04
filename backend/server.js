@@ -1,8 +1,9 @@
 const express = require('express')
 const dotenv = require('dotenv')
-const products = require('./data/products')
 const connectDB = require('./config/db')
 const colors = require('colors')
+const productRoutes = require('./routes/productRoutes')
+const { notFound, errorHandler } = require('./middleware/errorMiddleware')
 
 dotenv.config()
 connectDB()
@@ -12,13 +13,16 @@ connectDB()
 
 app.get('/', (req, res) => res.send('api is coiming'))
 
-app.get('/api/products', (req, res) => {
-  res.json(products)
-})
-app.get('/api/products/:id', (req, res) => {
-  const product = products.find((e) => e._id === req.params.id)
-  res.json(product)
-})
+app.use('/api/products', productRoutes)
+// app.use((req, res, next) => {
+//   // console.log('hello')
+//   console.log(req.originalUrl)
+//   next()
+// })
+
+app.use(notFound)
+app.use(errorHandler)
+
 const PORT = process.env.PORT || 5000
 app.listen(
   PORT,
